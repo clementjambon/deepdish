@@ -112,13 +112,13 @@ def _get_compression_filters(compression='default'):
 
 
 def _save_ndarray(handler, group, name, x, filters=None):
-    if np.issubdtype(x.dtype, np.unicode_):
+    if np.issubdtype(x.dtype, np.str_):
         # Convert unicode strings to pure byte arrays
         strtype = b'unicode'
         itemsize = x.itemsize // 4
         atom = tables.UInt8Atom()
         x = x.view(dtype=np.uint8)
-    elif np.issubdtype(x.dtype, np.string_):
+    elif np.issubdtype(x.dtype, np.bytes_):
         strtype = b'ascii'
         itemsize = x.itemsize
         atom = tables.StringAtom(itemsize)
@@ -451,9 +451,9 @@ def _load_nonlink_level(handler, level, pathtable, pathname):
             strtype = level._v_attrs.strtype
             itemsize = level._v_attrs.itemsize
             if strtype == b'unicode':
-                return level[:].view(dtype=(np.unicode_, itemsize))
+                return level[:].view(dtype=(np.str_, itemsize))
             elif strtype == b'ascii':
-                return level[:].view(dtype=(np.string_, itemsize))
+                return level[:].view(dtype=(np.bytes_, itemsize))
         # This serves two purposes:
         # (1) unpack big integers: the only time we save arrays like this
         # (2) unpack non-deepdish "scalars"
